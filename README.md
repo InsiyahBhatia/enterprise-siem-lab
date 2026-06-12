@@ -1,13 +1,13 @@
-# Enterprise AD Monitoring with Splunk SIEM
+# Enterprise SIEM Lab
 
-A virtualized enterprise lab environment simulating a real-world Windows Active Directory infrastructure integrated with **Splunk Enterprise** for security monitoring, log ingestion, and threat detection.
+A virtualized enterprise lab environment for security monitoring, log ingestion, and threat detection. Built with Windows Active Directory and Splunk SIEM, with room to expand across additional platforms and tools.
 
 ## Repository Structure
 
 ```
-splunk-lab/
+enterprise-siem-lab/
 ├── README.md
-├── docs/                          # Documentation (10 guides)
+├── docs/
 │   ├── 01-lab-architecture.md
 │   ├── 02-splunk-overview.md
 │   ├── 03-splunk-components.md
@@ -18,17 +18,13 @@ splunk-lab/
 │   ├── 08-spl-queries.md
 │   ├── 09-dashboards.md
 │   └── screenshots.md
-├── spl/                           # Ready-to-run SPL queries
+├── spl/
 │   ├── authentication.spl
 │   ├── kerberos.spl
 │   ├── processes.spl
 │   ├── privileged-activity.spl
 │   └── volume-monitoring.spl
-└── screenshots/                   # 12 annotated screenshots
-    ├── 01-splunk-configuration-*.png
-    ├── 02-splunk-search-raw-*.png
-    ├── ...
-    └── 12-splunk-visualization-logon-timechart.png
+└── screenshots/
 ```
 
 ## Contents
@@ -42,26 +38,24 @@ splunk-lab/
 | [05-deployment-architecture.md](docs/05-deployment-architecture.md) | Single instance, distributed, and clustered architectures |
 | [06-implementation-guide.md](docs/06-implementation-guide.md) | Step-by-step AD setup, Splunk install, UF configuration |
 | [07-event-log-collection.md](docs/07-event-log-collection.md) | Windows Event IDs (4624, 4625, 4768–4771, 4688, etc.), forwarding config |
-| [08-spl-queries.md](docs/08-spl-queries.md) | 20+ SPL queries for auth, Kerberos, processes, privilege monitoring |
+| [08-spl-queries.md](docs/08-spl-queries.md) | SPL queries for auth, Kerberos, processes, privilege monitoring |
 | [09-dashboards.md](docs/09-dashboards.md) | Dashboard design, panel types, sample layouts |
 | [screenshots.md](docs/screenshots.md) | Full screenshot index with descriptions |
 
 ## Screenshots
 
-All 12 screenshots follow the naming convention `NN-{category}-{action}-{detail}.png`:
+See [docs/screenshots.md](docs/screenshots.md) for the complete index. Screenshots follow the naming convention `NN-{category}-{action}-{detail}.png` and are stored in the `screenshots/` directory.
 
-| | Category | # | Description |
-|---|----------|---|-------------|
-| ⚙️ | **Configuration** | 1 | Splunk receiving port setup |
-| 🔍 | **Search** | 2–9 | Raw events, EventCode 4624/4625, WinEventLog, host filter, Kerberos events |
-| 📊 | **Statistics** | 1 | EventCode count aggregation |
-| 📈 | **Visualization** | 2 | Bar chart & logon timechart |
-
-See [docs/screenshots.md](docs/screenshots.md) for the complete index.
+| Category | Count | Scope |
+|----------|-------|-------|
+| Configuration | 1 | Splunk receiving port setup |
+| Search | 8 | Raw events, EventCode filters, WinEventLog, host filter, Kerberos events |
+| Statistics | 1 | EventCode count aggregation |
+| Visualization | 2 | Bar chart, logon timechart |
 
 ## SPL Queries
 
-The [spl/](spl/) directory contains ready-to-run `.spl` files organized by security domain:
+The [spl/](spl/) directory contains reusable query files organized by security domain:
 
 | File | Focus |
 |------|-------|
@@ -71,7 +65,7 @@ The [spl/](spl/) directory contains ready-to-run `.spl` files organized by secur
 | `privileged-activity.spl` | Privileged service calls, admin logon monitoring |
 | `volume-monitoring.spl` | Event volume, daily/hourly trends, event type breakdown |
 
-## Skills Covered
+## Skills
 
 - **Windows Administration**: Active Directory, DNS, DHCP, User/Group Management
 - **SIEM Engineering**: Splunk Enterprise, Universal Forwarder, Log Ingestion, Dashboarding
