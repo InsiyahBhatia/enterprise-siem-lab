@@ -1,0 +1,31 @@
+# Successful Logins
+index=windows sourcetype=WinEventLog:Security EventCode=4624
+| table _time, Account_Name, Source_Network_Address, Logon_Type
+| sort - _time
+
+# Failed Logins
+index=windows sourcetype=WinEventLog:Security EventCode=4625
+| table _time, Account_Name, Source_Network_Address, Failure_Reason
+| sort - _time
+
+# Failed Login Summary
+index=windows sourcetype=WinEventLog:Security EventCode=4625
+| stats count by Account_Name, Source_Network_Address
+| sort - count
+| where count > 5
+
+# Login Timeline
+index=windows sourcetype=WinEventLog:Security (EventCode=4624 OR EventCode=4625)
+| eval status = if(EventCode=4624, "Success", "Failure")
+| timechart count by status
+
+# Brute Force Detection
+index=windows sourcetype=WinEventLog:Security EventCode=4625
+| bucket _time span=5m
+| stats count by _time, Account_Name, Source_Network_Address
+| where count > 5
+
+# RDP Logins
+index=windows sourcetype=WinEventLog:Security EventCode=4624 Logon_Type=10
+| table _time, Account_Name, Source_Network_Address
+| sort - _time

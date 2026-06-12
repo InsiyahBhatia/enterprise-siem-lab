@@ -1,0 +1,31 @@
+# Top Event Codes
+index=windows sourcetype=WinEventLog:Security
+| stats count by EventCode
+| sort - count
+| head 20
+
+# Daily Event Volume
+index=windows sourcetype=WinEventLog:Security
+| timechart span=1d count
+
+# Hourly Event Volume
+index=windows sourcetype=WinEventLog:Security
+| timechart span=1h count
+
+# Event Type Breakdown
+index=windows sourcetype=WinEventLog:Security
+| eval event_type = case(
+    EventCode=4624, "Logon Success",
+    EventCode=4625, "Logon Failure",
+    EventCode=4688, "Process",
+    EventCode=4768, "Kerberos TGT",
+    EventCode=4769, "Kerberos Ticket",
+    EventCode=4673, "Privileged Service",
+    EventCode=4674, "Privileged Operation",
+    1=1, "Other")
+| stats count by event_type
+
+# Volume by Source Type
+index=windows
+| stats count by sourcetype
+| sort - count

@@ -1,0 +1,18 @@
+# All Privileged Events
+index=windows sourcetype=WinEventLog:Security (EventCode=4673 OR EventCode=4674)
+| table _time, Account_Name, Privileges, Process_Name
+| sort - _time
+
+# Privileged Activity by User
+index=windows sourcetype=WinEventLog:Security (EventCode=4673 OR EventCode=4674)
+| stats count by Account_Name
+| sort - count
+
+# Privileged Activity Timeline
+index=windows sourcetype=WinEventLog:Security (EventCode=4673 OR EventCode=4674)
+| timechart count
+
+# Admin Logon Monitoring
+index=windows sourcetype=WinEventLog:Security EventCode=4672
+| table _time, Account_Name, Process_Name
+| sort - _time

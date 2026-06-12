@@ -1,0 +1,19 @@
+# All Kerberos Activity
+index=windows sourcetype=WinEventLog:Security (EventCode=4768 OR EventCode=4769)
+| table _time, Account_Name, EventCode, Service_Name
+| sort - _time
+
+# Kerberos Failures
+index=windows sourcetype=WinEventLog:Security (EventCode=4771 OR EventCode=4772)
+| table _time, Account_Name, Client_Address, Failure_Code
+| sort - _time
+
+# TGT Requests by User
+index=windows sourcetype=WinEventLog:Security EventCode=4768
+| stats count by Account_Name
+| sort - count
+
+# Service Ticket Requests
+index=windows sourcetype=WinEventLog:Security EventCode=4769
+| stats count by Service_Name
+| sort - count

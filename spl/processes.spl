@@ -1,0 +1,19 @@
+# Process Count by Executable
+index=windows sourcetype=WinEventLog:Security EventCode=4688
+| stats count by New_Process_Name
+| sort - count
+
+# Process Creation Timeline
+index=windows sourcetype=WinEventLog:Security EventCode=4688
+| timechart count
+
+# Suspicious Process Detection
+index=windows sourcetype=WinEventLog:Security EventCode=4688
+| search New_Process_Name IN ("*powershell*", "*cmd.exe*", "*wscript*", "*cscript*", "*rundll32*", "*regsvr32*", "*mshta*", "*wmic*")
+| table _time, Account_Name, New_Process_Name, Parent_Process_Name
+| sort - _time
+
+# Process Events by User
+index=windows sourcetype=WinEventLog:Security EventCode=4688
+| stats count by Account_Name
+| sort - count
