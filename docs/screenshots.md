@@ -1,6 +1,6 @@
 # Screenshots
 
-Screenshots are located in the `screenshots/` directory and document the lab setup, configuration, Splunk searches, visualizations, SPL commands, and threat hunting queries.
+Screenshots are located in the `screenshots/` directory and document the lab setup, configuration, Splunk searches, SPL commands, threat hunting queries, and dashboard.
 
 ---
 
@@ -94,7 +94,7 @@ EventCode=4771
 
 ---
 
-## Statistics
+## Statistics & Visualizations
 
 ### Event Code Count Statistics
 
@@ -105,8 +105,6 @@ index=* | stats count by EventCode
 ![](../screenshots/10-splunk-statistics-event-code-count.png)
 
 ---
-
-## Visualizations
 
 ### Bar Chart — Event Code Distribution
 
@@ -130,209 +128,135 @@ EventCode=4624 OR EventCode=4625 | timechart count by EventCode
 
 ## SPL Commands
 
-### 13 — stats: Privilege Use Event Count by Host
+### 1. stats — Aggregate and Summarize Data
 
-```
-EventCode=4672 | stats count by host
-```
+**Example:** `EventCode=4672 | stats count by host`
 
 ![](../screenshots/13-privilege-use-event-count-by-host.png)
 
----
-
-### 14 — timechart: Privilege Use by Date
-
-```
-EventCode=4672 | timechart count by EventCode
-```
-
-![](../screenshots/14-privilege-use-timechart-by-date.png)
-
----
-
-### 15 — top: Top Accounts with Privilege Events
-
-```
-EventCode=4672 OR EventCode=4673 OR EventCode=4674 | top Account_Name
-```
-
-![](../screenshots/15-privilege-use-top-account-names.png)
-
----
-
-### 16 — stats: Privilege Events by Account
-
-```
-EventCode=4672 OR EventCode=4673 OR EventCode=4674 | stats count by Account_Name
-```
+**Example:** `EventCode=4672 OR EventCode=4673 OR EventCode=4674 | stats count by Account_Name`
 
 ![](../screenshots/16-privilege-use-stats-account-names.png)
 
----
-
-### 17 — timechart: Service Events by EventCode
-
-```
-EventCode=7036 OR EventCode=7045 | timechart count by EventCode
-```
-
-![](../screenshots/17-service-events-timechart-by-eventcode.png)
-
----
-
-### 18 — chart: Service Events Column Chart
-
-```
-EventCode=7036 | chart count over host
-```
-
-![](../screenshots/18-service-events-column-chart.png)
-
----
-
-### 19 — stats: Directory Service Events
-
-```
-EventCode=4 | stats count
-```
+**Example:** `EventCode=4 | stats count`
 
 ![](../screenshots/19-directory-service-events-stats.png)
 
----
-
-### 20 — stats: Firewall Events Pie Chart
-
-```
-EventCode=5156 | stats count by Action
-```
+**Example:** `EventCode=5156 | stats count by Action`
 
 ![](../screenshots/20-firewall-events-pie-chart.png)
 
 ---
 
-### 21 — table: Process Creation
+### 2. table — Display Selected Fields
 
-```
-EventCode=4688 | table _time New_Process_Name
-```
-
-![](../screenshots/21-process-creation-table-view.png)
-
----
-
-### 22 — search: Service Installation Events
-
-```
-EventCode=7045
-```
-
-![](../screenshots/22-service-installation-raw-events.png)
-
----
-
-### 23 — rex: Extract Executables
-
-```
-EventCode=4688 | rex field=CommandLine "(?<Executable>\w+\.exe)"
-```
-
-![](../screenshots/23-logon-events-extract-executable.png)
-
----
-
-### 24 — table: Account Enumeration
-
-```
-EventCode=4624 | table Account_Name
-```
+**Example:** `EventCode=4624 | table Account_Name`
 
 ![](../screenshots/24-account-enumeration-table-command.png)
 
----
-
-### 25 — dedup: Unique Accounts
-
-```
-EventCode=4624 | dedup Account_Name
-```
-
-![](../screenshots/25-account-enumeration-deduplicated.png)
-
----
-
-### 26 — where: Filter by Count
-
-```
-EventCode=4624 | stats count by Account_Name | where count>10
-```
-
-![](../screenshots/26-account-enumeration-filtered-count.png)
-
----
-
-### 27 — eval: Risk Evaluation
-
-```
-EventCode=4624 | stats count by Account_Name | eval Risk=if(count>100,"HIGH","LOW")
-```
-
-![](../screenshots/27-account-enumeration-risk-evaluation.png)
-
----
-
-### 28 — table: Privilege Operations
-
-```
-EventCode=4673 OR EventCode=4674 | table _time Account_Name
-```
+**Example:** `EventCode=4673 OR EventCode=4674 | table _time Account_Name`
 
 ![](../screenshots/28-privilege-operations-event-list.png)
 
 ---
 
-### 29 — chart: Account Activity
+### 3. sort — Sort Results Ascending or Descending
 
-```
-EventCode=4624 | chart count by Account_Name
-```
+**Example:** `EventCode=4624 | stats count by Account_Name | sort - count`
+
+![](../screenshots/15-privilege-use-top-account-names.png)
+
+**Example:** `EventCode=4624 | chart count by Account_Name | sort - count`
 
 ![](../screenshots/29-account-activity-chart-command.png)
 
----
-
-### 30 — transaction: Logon Session View
-
-```
-EventCode=4624 OR EventCode=4634 | transaction Account_Name
-```
-
-![](../screenshots/30-logon-events-transaction-view.png)
-
----
-
-### 31 — top: Host Summary
-
-```
-EventCode=4624 | fields host | top limit=20 host
-```
+**Example:** `EventCode=4624 | fields host | top limit=20 host`
 
 ![](../screenshots/31-host-summary-top-limit.png)
 
 ---
 
-### 32 — search: Administrator Events
+### 4. where — Filter Results After Aggregation
 
-```
-search Account_Name=Administrator
-```
+**Example:** `EventCode=4624 | stats count by Account_Name | where count>10`
+
+![](../screenshots/26-account-enumeration-filtered-count.png)
+
+---
+
+### 5. eval — Create New Calculated Fields
+
+**Example:** `EventCode=4624 | stats count by Account_Name | eval Risk=if(count>100,"HIGH","LOW")`
+
+![](../screenshots/27-account-enumeration-risk-evaluation.png)
+
+---
+
+### 6. timechart — Time-Based Visualizations
+
+**Example:** `EventCode=4672 | timechart count by EventCode`
+
+![](../screenshots/14-privilege-use-timechart-by-date.png)
+
+**Example:** `EventCode=7036 OR EventCode=7045 | timechart count by EventCode`
+
+![](../screenshots/17-service-events-timechart-by-eventcode.png)
+
+**Example:** `EventCode=7036 | chart count over host`
+
+![](../screenshots/18-service-events-column-chart.png)
+
+---
+
+### 7. search — Filter Events by Keywords or Field Values
+
+**Example:** `search Account_Name=Administrator`
 
 ![](../screenshots/32-administrator-logon-events.png)
+
+**Example:** `EventCode=7045`
+
+![](../screenshots/22-service-installation-raw-events.png)
+
+---
+
+### 8. fields — Display Only Specified Fields
+
+**Example:** `EventCode=4688 | fields host New_Process_Name`
+
+![](../screenshots/21-process-creation-table-view.png)
+
+---
+
+## Additional SPL Examples
+
+### Deduplicate Events (dedup)
+
+**Example:** `EventCode=4624 | dedup Account_Name`
+
+![](../screenshots/25-account-enumeration-deduplicated.png)
+
+---
+
+### Extract Fields with Regex (rex)
+
+**Example:** `EventCode=4688 | rex field=CommandLine "(?<Executable>\w+\.exe)"`
+
+![](../screenshots/23-logon-events-extract-executable.png)
+
+---
+
+### Group Events into Sessions (transaction)
+
+**Example:** `EventCode=4624 OR EventCode=4634 | transaction Account_Name`
+
+![](../screenshots/30-logon-events-transaction-view.png)
 
 ---
 
 ## Threat Hunting
 
-### 33 — Network Tool Detection
+### Network Tool Detection
 
 ```
 wget OR curl
@@ -344,7 +268,7 @@ Detect potential unauthorized network tool usage.
 
 ---
 
-### 34 — Process Creation Monitoring
+### Process Creation Monitoring
 
 ```
 EventCode=4688
@@ -358,8 +282,8 @@ Track newly created processes.
 
 ## Dashboard
 
-### 35 — Windows Event Monitoring Dashboard
+### Windows Event Monitoring & Threat Hunting Dashboard
 
-The final dashboard includes: Total Events, Successful Logins, Failed Logins, Privileged Logons, Top Event IDs, Authentication Activity, User Login Activity, EventCode Distribution, Logon Trend Comparison, Most Active Process Paths, and User Authentication Flow.
+The final dashboard includes 11 panels: Total Events, Successful Logins, Failed Logins, Privileged Logons, Top Event IDs, Authentication Activity, User Login Distribution, Event Distribution Analysis, Authentication Trend, Process Monitoring, and User Authentication Flow.
 
 ![](../screenshots/35-windows-event-monitoring-dashboard.png)

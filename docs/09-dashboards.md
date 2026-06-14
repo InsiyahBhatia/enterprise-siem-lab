@@ -6,143 +6,180 @@
 
 ---
 
-## Dashboard Overview
+## Dashboard Panels
 
-The lab includes dashboards for monitoring core security domains:
+### Panel 1 – Total Events
 
-1. **Authentication Activity** - Login success/failure trends
-2. **Failed Login Monitoring** - Brute force detection
-3. **Kerberos Activity** - TGT and service ticket analysis
-4. **Process Creation** - New process tracking and anomaly detection
-5. **Event Volume** - Ingest health monitoring
-6. **User Activity** - Login patterns and session tracking
-
-## Panel Types
-
-| Panel | Use |
-|-------|-----|
-| Statistics Table | Detailed event listing |
-| Time Chart | Trends over time |
-| Bar/Column Chart | Comparisons |
-| Single Value | Key metric (total count, unique users) |
-| Pie Chart | Distribution breakdown |
-
-## Sample Dashboard Layout
-
-### Authentication Dashboard
-
-**Panel 1 - Time Chart**: Login success vs failure over time
-```
-index=windows sourcetype=WinEventLog:Security (EventCode=4624 OR EventCode=4625)
-| eval status = if(EventCode=4624, "Success", "Failure")
-| timechart count by status
-```
-
-**Panel 2 - Bar Chart**: Top users by login count
-```
-index=windows sourcetype=WinEventLog:Security EventCode=4624
-| stats count by Account_Name
-| sort - count
-| head 10
-```
-
-**Panel 3 - Pie Chart**: Logon type distribution
-```
-index=windows sourcetype=WinEventLog:Security EventCode=4624
-| stats count by Logon_Type
-| eval Logon_Type_Label = case(
-    Logon_Type=2, "Interactive (Console)",
-    Logon_Type=3, "Network",
-    Logon_Type=5, "Service",
-    Logon_Type=10, "Remote Desktop",
-    1=1, "Other")
-```
-
-### Failed Login Dashboard
-
-```
-# Brute force detection
-index=windows sourcetype=WinEventLog:Security EventCode=4625
-| bucket _time span=5m
-| stats count by _time, Account_Name, Source_Network_Address
-| where count > 5
-
-# Top failed accounts
-index=windows sourcetype=WinEventLog:Security EventCode=4625
-| stats count by Account_Name
-| sort - count
-| head 10
-
-# Source IP analysis
-index=windows sourcetype=WinEventLog:Security EventCode=4625
-| stats count by Source_Network_Address
-| sort - count
-| head 10
-```
-
-## Creating Dashboards in Splunk Web
-
-1. **Dashboards** → **Create New Dashboard**
-2. Choose **Dashboard Studio** (visual editor) or **Classic** (XML)
-3. Add panels using the search queries above
-4. Configure time range picker for user flexibility
-5. Add inputs (dropdowns, text boxes) for interactive filtering
-6. Save and set permissions
-
-## Threat Hunting Queries
-
-### Privilege Escalation Activity
-
+**Query**
 ```spl
-EventCode=4672 OR EventCode=4673 OR EventCode=4674
+index=*
+| stats count
 ```
 
-Purpose: Detect accounts receiving administrative privileges.
+**Visualization:** Single Value
 
-![Privilege Use Stats](../screenshots/16-privilege-use-stats-account-names.png)
+**Purpose:** Shows total events collected.
 
 ---
 
-### Service Activity Monitoring
+### Panel 2 – Successful Login Attempts
 
+**Query**
 ```spl
-EventCode=7036 OR EventCode=7045
+EventCode=4624
+| stats count
 ```
 
-Purpose: Monitor service installations and state changes.
+**Visualization:** Single Value
 
-![Service Events](../screenshots/18-service-events-column-chart.png)
+**Purpose:** Displays total successful logins.
 
 ---
 
-### Process Creation Monitoring
+### Panel 3 – Failed Login Attempts
 
+**Query**
+```spl
+EventCode=4625
+| stats count
+```
+
+**Visualization:** Single Value
+
+**Purpose:** Displays failed logins.
+
+---
+
+### Panel 4 – Privileged Logons
+
+**Query**
+```spl
+EventCode=4672
+| stats count
+```
+
+**Visualization:** Single Value
+
+**Purpose:** Tracks administrative privilege assignments.
+
+---
+
+### Panel 5 – Top Event IDs
+
+**Query**
+```spl
+index=*
+| stats count by EventCode
+| sort - count
+| head 10
+```
+
+**Visualization:** Horizontal Bar Chart
+
+**Purpose:** Shows most common Windows Event IDs.
+
+---
+
+### Panel 6 – Authentication Activity
+
+**Query**
+```spl
+EventCode=4624 OR EventCode=4625
+| timechart count by EventCode
+```
+
+**Visualization:** Line Chart
+
+**Purpose:** Compare successful vs failed logins over time.
+
+---
+
+### Panel 7 – User Login Distribution
+
+**Query**
+```spl
+EventCode=4624
+| stats count by Account_Name
+```
+
+**Visualization:** Pie Chart
+
+**Purpose:** Shows most active users.
+
+---
+
+### Panel 8 – Event Distribution Analysis
+
+**Query**
+```spl
+index=*
+| stats count by EventCode
+```
+
+**Visualization:** Bubble Chart
+
+**Purpose:** Visualize event frequency distribution.
+
+---
+
+### Panel 9 – Authentication Trend
+
+**Query**
+```spl
+EventCode=4768 OR EventCode=4769
+| timechart count by EventCode
+```
+
+**Visualization:** Area Chart
+
+**Purpose:** Monitor Kerberos authentication activity.
+
+---
+
+### Panel 10 – Process Monitoring
+
+**Query**
 ```spl
 EventCode=4688
+| stats count by New_Process_Name
+| sort - count
+| head 10
 ```
 
-Purpose: Track newly created processes.
+**Visualization:** Horizontal Bar Chart
 
-![Process Creation](../screenshots/21-process-creation-table-view.png)
+**Purpose:** Shows most executed processes.
 
 ---
 
-### Network Tool Detection
+### Panel 11 – User Authentication Flow
 
+**Query**
 ```spl
-wget OR curl
+EventCode=4624 OR EventCode=4625 OR EventCode=4672
+| eval Event=case(
+EventCode=4624,"Successful Login",
+EventCode=4625,"Failed Login",
+EventCode=4672,"Admin Privilege Assigned"
+)
+| stats count as Events by Account_Name Event
 ```
 
-Purpose: Detect potential unauthorized network tool usage.
+**Visualization:** Sankey Diagram
 
-![wget curl Activity](../screenshots/33-wget-curl-network-activity.png)
+**Purpose:** Shows how users flow into successful logins, failed logins, and privileged logons. 
 
 ---
 
-## Best Practices
+## Skills Demonstrated
 
-- Use consistent color schemes (red for failures, green for success)
-- Set appropriate time ranges for each panel
-- Add descriptions to explain what each panel represents
-- Use drilldowns to enable investigation from dashboard panels
-- Schedule dashboard PDF delivery for recurring reports
+* Splunk Enterprise Administration
+* Splunk Universal Forwarder Configuration
+* Windows Event Log Analysis
+* Sysmon Monitoring
+* SPL Query Development
+* Dashboard Creation
+* Threat Hunting
+* Authentication Monitoring
+* Security Event Investigation
+* SOC Analyst Workflows
