@@ -1,5 +1,176 @@
 # SPL Query Reference
 
+## SPL Commands Used
+
+### 1. stats
+
+**Theory** — The `stats` command aggregates and summarizes data using functions like `count`, `sum`, `avg`, `distinct_count`, etc.
+
+**Example**
+```spl
+EventCode=4624 OR EventCode=4673 OR EventCode=4672
+| stats count by Account_Name
+```
+
+![Privilege Use Stats by Account](../screenshots/16-privilege-use-stats-account-names.png)
+
+---
+
+### 2. table
+
+**Theory** — The `table` command displays only the specified fields in a tabular format.
+
+**Example**
+```spl
+EventCode=4624
+| table _time Account_Name host
+```
+
+![Account Enumeration Table](../screenshots/24-account-enumeration-table-command.png)
+
+---
+
+### 3. top
+
+**Theory** — The `top` command shows the most frequent values of a field, sorted by count descending.
+
+**Example**
+```spl
+(EventCode=4672 OR EventCode=4673 OR EventCode=4674)
+| top Account_Name
+```
+
+![Privilege Use Top Accounts](../screenshots/15-privilege-use-top-account-names.png)
+
+---
+
+### 4. where
+
+**Theory** — The `where` command filters results after aggregation or eval, using boolean expressions.
+
+**Example**
+```spl
+EventCode=4624
+| stats count by Account_Name
+| where count>10
+```
+
+![Filtered Account Count](../screenshots/26-account-enumeration-filtered-count.png)
+
+---
+
+### 5. eval
+
+**Theory** — The `eval` command creates new calculated fields using expressions, conditionals, and string functions.
+
+**Example**
+```spl
+EventCode=4624
+| stats count by Account_Name
+| eval Risk=if(count>100,"HIGH","LOW")
+```
+
+![Risk Evaluation](../screenshots/27-account-enumeration-risk-evaluation.png)
+
+---
+
+### 6. timechart
+
+**Theory** — The `timechart` command creates time-based trend visualizations, automatically grouping events into time buckets.
+
+**Example**
+```spl
+EventCode=7036 OR EventCode=7045
+| timechart count by EventCode
+```
+
+![Service Events Timechart](../screenshots/17-service-events-timechart-by-eventcode.png)
+
+---
+
+### 7. search
+
+**Theory** — The `search` command filters events by keywords or field-value pairs. It is implicit at the start of any SPL query.
+
+**Example**
+```spl
+search Account_Name=Administrator
+```
+
+![Administrator Logon Events](../screenshots/32-administrator-logon-events.png)
+
+---
+
+### 8. fields
+
+**Theory** — The `fields` command retains or removes specified fields from search results.
+
+**Example**
+```spl
+EventCode=4624
+| fields host
+| top limit=20 host
+```
+
+![Host Summary](../screenshots/31-host-summary-top-limit.png)
+
+---
+
+### 9. dedup
+
+**Theory** — The `dedup` command removes duplicate events based on specified field values, keeping only the first occurrence.
+
+**Example**
+```spl
+EventCode=4624 | dedup Account_Name
+| table _time Account_Name host
+```
+
+![Deduplicated Accounts](../screenshots/25-account-enumeration-deduplicated.png)
+
+---
+
+### 10. chart
+
+**Theory** — The `chart` command produces tabular aggregations suitable for visualizing as bar, column, or pie charts.
+
+**Example**
+```spl
+EventCode=4624 | chart count by Account_Name
+```
+
+![Account Activity Chart](../screenshots/29-account-activity-chart-command.png)
+
+---
+
+### 11. rex
+
+**Theory** — The `rex` command extracts fields from event data using named regular expression groups.
+
+**Example**
+```spl
+EventCode=4688
+| rex field=CommandLine "(?<Executable>\w+\.exe)"
+```
+
+![Extract Executable](../screenshots/23-logon-events-extract-executable.png)
+
+---
+
+### 12. transaction
+
+**Theory** — The `transaction` command groups related events into sessions based on common field values, with optional time limits.
+
+**Example**
+```spl
+(EventCode=4624 OR EventCode=4634)
+| transaction Account_Name
+```
+
+![Transaction View](../screenshots/30-logon-events-transaction-view.png)
+
+---
+
 ## Authentication Monitoring
 
 ```spl

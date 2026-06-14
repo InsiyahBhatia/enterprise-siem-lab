@@ -1,35 +1,365 @@
 # Screenshots
 
-Screenshots are located in the `screenshots/` directory and document the lab setup, configuration, and Splunk operations.
+Screenshots are located in the `screenshots/` directory and document the lab setup, configuration, Splunk searches, visualizations, SPL commands, and threat hunting queries.
+
+---
 
 ## Configuration
 
-| Screenshot | Description |
-|------------|-------------|
-| [01-splunk-configuration-receiving-port-9997.png](../screenshots/01-splunk-configuration-receiving-port-9997.png) | Splunk receiving port configuration (9997) |
+### Splunk Receiving Port Configuration (9997)
+
+![](../screenshots/01-splunk-configuration-receiving-port-9997.png)
+
+---
 
 ## Search & Events
 
-| Screenshot | Description |
-|------------|-------------|
-| [02-splunk-search-raw-all-events.png](../screenshots/02-splunk-search-raw-all-events.png) | Search all events with `index=*` |
-| [03-splunk-search-event-4624-successful-logon.png](../screenshots/03-splunk-search-event-4624-successful-logon.png) | Search successful logons (EventCode=4624) |
-| [04-splunk-search-event-4625-failed-logon.png](../screenshots/04-splunk-search-event-4625-failed-logon.png) | Search failed logons (EventCode=4625) |
-| [05-splunk-search-source-win-event-log-security.png](../screenshots/05-splunk-search-source-win-event-log-security.png) | Search Windows Security event log source |
-| [06-splunk-search-host-central-server.png](../screenshots/06-splunk-search-host-central-server.png) | Search events from host CENTRAL-SRV |
-| [07-splunk-search-event-4768-kerberos-ticket-request.png](../screenshots/07-splunk-search-event-4768-kerberos-ticket-request.png) | Search Kerberos TGT requests (EventCode=4768) |
-| [08-splunk-search-event-4769-kerberos-service-ticket.png](../screenshots/08-splunk-search-event-4769-kerberos-service-ticket.png) | Search Kerberos service tickets (EventCode=4769) |
-| [09-splunk-search-event-4771-kerberos-pre-auth-failure.png](../screenshots/09-splunk-search-event-4771-kerberos-pre-auth-failure.png) | Search Kerberos pre-auth failures (EventCode=4771) |
+### Search All Events
+
+```
+index=*
+```
+
+![](../screenshots/02-splunk-search-raw-all-events.png)
+
+---
+
+### Search Successful Logons (EventCode=4624)
+
+```
+EventCode=4624
+```
+
+![](../screenshots/03-splunk-search-event-4624-successful-logon.png)
+
+---
+
+### Search Failed Logons (EventCode=4625)
+
+```
+EventCode=4625
+```
+
+![](../screenshots/04-splunk-search-event-4625-failed-logon.png)
+
+---
+
+### Search Windows Security Event Log Source
+
+```
+sourcetype=WinEventLog:Security
+```
+
+![](../screenshots/05-splunk-search-source-win-event-log-security.png)
+
+---
+
+### Search Events from Host CENTRAL-SRV
+
+```
+host=CENTRAL-SRV
+```
+
+![](../screenshots/06-splunk-search-host-central-server.png)
+
+---
+
+### Search Kerberos TGT Requests (EventCode=4768)
+
+```
+EventCode=4768
+```
+
+![](../screenshots/07-splunk-search-event-4768-kerberos-ticket-request.png)
+
+---
+
+### Search Kerberos Service Tickets (EventCode=4769)
+
+```
+EventCode=4769
+```
+
+![](../screenshots/08-splunk-search-event-4769-kerberos-service-ticket.png)
+
+---
+
+### Search Kerberos Pre-Auth Failures (EventCode=4771)
+
+```
+EventCode=4771
+```
+
+![](../screenshots/09-splunk-search-event-4771-kerberos-pre-auth-failure.png)
+
+---
 
 ## Statistics
 
-| Screenshot | Description |
-|------------|-------------|
-| [10-splunk-statistics-event-code-count.png](../screenshots/10-splunk-statistics-event-code-count.png) | Statistics table of EventCode counts |
+### Event Code Count Statistics
+
+```
+index=* | stats count by EventCode
+```
+
+![](../screenshots/10-splunk-statistics-event-code-count.png)
+
+---
 
 ## Visualizations
 
-| Screenshot | Description |
-|------------|-------------|
-| [11-splunk-visualization-event-code-bar-chart.png](../screenshots/11-splunk-visualization-event-code-bar-chart.png) | Bar chart visualization of EventCode distribution |
-| [12-splunk-visualization-logon-timechart.png](../screenshots/12-splunk-visualization-logon-timechart.png) | Timechart comparing successful vs failed logons |
+### Bar Chart — Event Code Distribution
+
+```
+index=* | stats count by EventCode | sort - count
+```
+
+![](../screenshots/11-splunk-visualization-event-code-bar-chart.png)
+
+---
+
+### Timechart — Successful vs Failed Logons
+
+```
+EventCode=4624 OR EventCode=4625 | timechart count by EventCode
+```
+
+![](../screenshots/12-splunk-visualization-logon-timechart.png)
+
+---
+
+## SPL Commands
+
+### 13 — stats: Privilege Use Event Count by Host
+
+```
+EventCode=4672 | stats count by host
+```
+
+![](../screenshots/13-privilege-use-event-count-by-host.png)
+
+---
+
+### 14 — timechart: Privilege Use by Date
+
+```
+EventCode=4672 | timechart count by EventCode
+```
+
+![](../screenshots/14-privilege-use-timechart-by-date.png)
+
+---
+
+### 15 — top: Top Accounts with Privilege Events
+
+```
+EventCode=4672 OR EventCode=4673 OR EventCode=4674 | top Account_Name
+```
+
+![](../screenshots/15-privilege-use-top-account-names.png)
+
+---
+
+### 16 — stats: Privilege Events by Account
+
+```
+EventCode=4672 OR EventCode=4673 OR EventCode=4674 | stats count by Account_Name
+```
+
+![](../screenshots/16-privilege-use-stats-account-names.png)
+
+---
+
+### 17 — timechart: Service Events by EventCode
+
+```
+EventCode=7036 OR EventCode=7045 | timechart count by EventCode
+```
+
+![](../screenshots/17-service-events-timechart-by-eventcode.png)
+
+---
+
+### 18 — chart: Service Events Column Chart
+
+```
+EventCode=7036 | chart count over host
+```
+
+![](../screenshots/18-service-events-column-chart.png)
+
+---
+
+### 19 — stats: Directory Service Events
+
+```
+EventCode=4 | stats count
+```
+
+![](../screenshots/19-directory-service-events-stats.png)
+
+---
+
+### 20 — stats: Firewall Events Pie Chart
+
+```
+EventCode=5156 | stats count by Action
+```
+
+![](../screenshots/20-firewall-events-pie-chart.png)
+
+---
+
+### 21 — table: Process Creation
+
+```
+EventCode=4688 | table _time New_Process_Name
+```
+
+![](../screenshots/21-process-creation-table-view.png)
+
+---
+
+### 22 — search: Service Installation Events
+
+```
+EventCode=7045
+```
+
+![](../screenshots/22-service-installation-raw-events.png)
+
+---
+
+### 23 — rex: Extract Executables
+
+```
+EventCode=4688 | rex field=CommandLine "(?<Executable>\w+\.exe)"
+```
+
+![](../screenshots/23-logon-events-extract-executable.png)
+
+---
+
+### 24 — table: Account Enumeration
+
+```
+EventCode=4624 | table Account_Name
+```
+
+![](../screenshots/24-account-enumeration-table-command.png)
+
+---
+
+### 25 — dedup: Unique Accounts
+
+```
+EventCode=4624 | dedup Account_Name
+```
+
+![](../screenshots/25-account-enumeration-deduplicated.png)
+
+---
+
+### 26 — where: Filter by Count
+
+```
+EventCode=4624 | stats count by Account_Name | where count>10
+```
+
+![](../screenshots/26-account-enumeration-filtered-count.png)
+
+---
+
+### 27 — eval: Risk Evaluation
+
+```
+EventCode=4624 | stats count by Account_Name | eval Risk=if(count>100,"HIGH","LOW")
+```
+
+![](../screenshots/27-account-enumeration-risk-evaluation.png)
+
+---
+
+### 28 — table: Privilege Operations
+
+```
+EventCode=4673 OR EventCode=4674 | table _time Account_Name
+```
+
+![](../screenshots/28-privilege-operations-event-list.png)
+
+---
+
+### 29 — chart: Account Activity
+
+```
+EventCode=4624 | chart count by Account_Name
+```
+
+![](../screenshots/29-account-activity-chart-command.png)
+
+---
+
+### 30 — transaction: Logon Session View
+
+```
+EventCode=4624 OR EventCode=4634 | transaction Account_Name
+```
+
+![](../screenshots/30-logon-events-transaction-view.png)
+
+---
+
+### 31 — top: Host Summary
+
+```
+EventCode=4624 | fields host | top limit=20 host
+```
+
+![](../screenshots/31-host-summary-top-limit.png)
+
+---
+
+### 32 — search: Administrator Events
+
+```
+search Account_Name=Administrator
+```
+
+![](../screenshots/32-administrator-logon-events.png)
+
+---
+
+## Threat Hunting
+
+### 33 — Network Tool Detection
+
+```
+wget OR curl
+```
+
+Detect potential unauthorized network tool usage.
+
+![](../screenshots/33-wget-curl-network-activity.png)
+
+---
+
+### 34 — Process Creation Monitoring
+
+```
+EventCode=4688
+```
+
+Track newly created processes.
+
+![](../screenshots/34-process-creation-all-events.png)
+
+---
+
+## Dashboard
+
+### 35 — Windows Event Monitoring Dashboard
+
+The final dashboard includes: Total Events, Successful Logins, Failed Logins, Privileged Logons, Top Event IDs, Authentication Activity, User Login Activity, EventCode Distribution, Logon Trend Comparison, Most Active Process Paths, and User Authentication Flow.
+
+![](../screenshots/35-windows-event-monitoring-dashboard.png)

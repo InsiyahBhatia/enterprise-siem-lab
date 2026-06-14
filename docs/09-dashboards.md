@@ -1,5 +1,11 @@
 # Dashboard Development
 
+## Final Dashboard
+
+![Windows Event Monitoring & Threat Hunting Dashboard](../screenshots/35-windows-event-monitoring-dashboard.png)
+
+---
+
 ## Dashboard Overview
 
 The lab includes dashboards for monitoring core security domains:
@@ -82,6 +88,56 @@ index=windows sourcetype=WinEventLog:Security EventCode=4625
 4. Configure time range picker for user flexibility
 5. Add inputs (dropdowns, text boxes) for interactive filtering
 6. Save and set permissions
+
+## Threat Hunting Queries
+
+### Privilege Escalation Activity
+
+```spl
+EventCode=4672 OR EventCode=4673 OR EventCode=4674
+```
+
+Purpose: Detect accounts receiving administrative privileges.
+
+![Privilege Use Stats](../screenshots/16-privilege-use-stats-account-names.png)
+
+---
+
+### Service Activity Monitoring
+
+```spl
+EventCode=7036 OR EventCode=7045
+```
+
+Purpose: Monitor service installations and state changes.
+
+![Service Events](../screenshots/18-service-events-column-chart.png)
+
+---
+
+### Process Creation Monitoring
+
+```spl
+EventCode=4688
+```
+
+Purpose: Track newly created processes.
+
+![Process Creation](../screenshots/21-process-creation-table-view.png)
+
+---
+
+### Network Tool Detection
+
+```spl
+wget OR curl
+```
+
+Purpose: Detect potential unauthorized network tool usage.
+
+![wget curl Activity](../screenshots/33-wget-curl-network-activity.png)
+
+---
 
 ## Best Practices
 
